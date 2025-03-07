@@ -1,0 +1,26 @@
+{
+    "name": "FRONT-PR3",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+      "start:store": "node servers/storeServer.js",
+      "start:admin": "node servers/adminServer.js",
+      "start": "concurrently \"npm run start:store\" \"npm run start:admin\"",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+      "cors": "^2.8.5",
+      "express": "^4.21.2",
+      "fs": "^0.0.1-security",
+      "swagger-jsdoc": "^6.2.8",
+      "swagger-ui-express": "^5.0.1",
+      "yamljs": "^0.3.0"
+    },
+    "devDependencies": {
+      "concurrently": "^9.1.2"
+    }
+  }
