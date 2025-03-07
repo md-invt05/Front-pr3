@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Витрина товаров</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="container mx-auto max-w-6xl">
+        <header class="mb-8">
+            <h1 class="text-4xl font-extrabold text-center text-purple-800">Каталог товаров</h1>
+            <p class="text-center text-gray-600 mt-2">Ознакомьтесь с нашими товарами</p>
+        </header>
+
+        <div id="products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+    
+    <script>
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                const productsContainer = document.getElementById('products');
+                productsContainer.innerHTML = products.map(product => `
+                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-200">
+                        <h2 class="text-2xl font-semibold text-purple-700">${product.name}</h2>
+                        <p class="text-gray-600 mt-2">${product.description}</p>
+                        <p class="text-xl font-bold text-purple-600 mt-3">${product.price} ₽</p>
+                        <p class="text-sm text-gray-500 mt-2">Категории: ${product.categories.join(', ')}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки товаров:', error);
+            }
+        }
+        fetchProducts();
+    </script>
+</body>
+</html>
