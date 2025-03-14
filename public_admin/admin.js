@@ -25,7 +25,7 @@ async function delete_products(id) {
 document.getElementById("productForm").addEventListener("submit",async (e) => {
     e.preventDefault();
     const name = document.getElementById("name").value;
-    const price = parseFloat(document.getElementById("editPrice").value);
+    const price = parseFloat(document.getElementById("price").value);
     const description = document.getElementById("description").value;
     const categories = document.getElementById("categories").value.split(",").map(cat => cat.trim());
 
