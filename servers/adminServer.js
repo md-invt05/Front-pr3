@@ -12,14 +12,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public_admin")));
 
 // Вставка json файла
-const fs = require('fs').promises;
+const fs = require('fs');
 const { json } = require("stream/consumers");
 const productsFile = path.join(__dirname, "products.json");
 
 // Настройка API-эндпоинтов
 app.get("/api/products", (req, res) => {
     try {
-        const products = JSON.parse(fs.readFile(productsFile,'utf-8'));
+        const products = JSON.parse(fs.readFileSync(productsFile,'utf-8'));
         res.json(products);
     } catch (error) {
         res.status(500).json({error: "Ошибка загрузки товаров"});
@@ -30,7 +30,7 @@ app.get("/api/products", (req, res) => {
 app.post("/api/products", (req, res) => {
     try {
         const newProducts = req.body;
-        let products = JSON.parse(fs.readFile(productsFile, "utf-8"));
+        let products = JSON.parse(fs.readFileSync(productsFile, "utf-8"));
 
         // Находим максимальный существующий ID
         const maxId = products.length > 0 ? Math.max(...products.map(p => p.id)) : 0;
@@ -41,7 +41,7 @@ app.post("/api/products", (req, res) => {
             products.push(product);
         });
 
-        fs.writeFile(productsFile, JSON.stringify(products, null, 2));
+        fs.writeFileSync(productsFile, JSON.stringify(products, null, 2));
         res.status(201).json({ message: "Товар(ы) добавлен(ы)", products });
     } catch (error) {
         res.status(500).json({ error: "Ошибка добавления товара" });
@@ -52,7 +52,7 @@ app.post("/api/products", (req, res) => {
 app.put("/api/products/:id", (req, res) => {
     try {
         const id = Number(req.params.id);
-        let products = JSON.parse(fs.readFile(productsFile, "utf-8"));
+        let products = JSON.parse(fs.readFileSync(productsFile, "utf-8"));
         const index = products.findIndex(p => p.id === id);
 
         if (index === -1) {
@@ -60,7 +60,7 @@ app.put("/api/products/:id", (req, res) => {
         }
 
         products[index] = { ...products[index], ...req.body };
-        fs.writeFile(productsFile, JSON.stringify(products, null, 2));
+        fs.writeFileSync(productsFile, JSON.stringify(products, null, 2));
         res.json({ message: "Товар обновлён", product: products[index] });
     } catch (error) {
         res.status(500).json({ error: "Ошибка обновления товара" });
@@ -71,10 +71,10 @@ app.put("/api/products/:id", (req, res) => {
 app.delete("/api/products/:id", (req, res) => {
     try {
         const id = Number(req.params.id);
-        let products = JSON.parse(fs.readFile(productsFile, "utf-8"));
+        let products = JSON.parse(fs.readFileSync(productsFile, "utf-8"));
         products = products.filter(p => p.id !== id);
 
-        fs.writeFile(productsFile, JSON.stringify(products, null, 2));
+        fs.writeFileSync(productsFile, JSON.stringify(products, null, 2));
         res.json({ message: "Товар удалён" });
     } catch (error) {
         res.status(500).json({ error: "Ошибка удаления товара" });

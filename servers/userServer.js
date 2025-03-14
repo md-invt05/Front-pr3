@@ -7,13 +7,13 @@ const PORT = 8080;
 app.use(express.static(path.join(__dirname, "../public_user")));
 
 //Parse json файла 
-const fs = require("fs").promises;
+const fs = require("fs");
 const productsFile = path.join(__dirname, "products.json");
 
 // Настройка api
 app.get("/api/products", (req,res) => {
     try {
-        const products = JSON.parse(fs.readFile(productsFile, 'utf-8'));
+        const products = JSON.parse(fs.readFileSync(productsFile, 'utf-8'));
         res.json(products);
     }
     catch(error) {

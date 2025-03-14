@@ -11,7 +11,7 @@ async function load_products() {
             <td class="p-4 hidden md:table-cell">${p.categories.join(", ")}</td>
             <td class="p-4 text-center">
                 <button onclick="editProduct(${p.id})" class="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg mr-2 transition duration-200">✏️</button>
-                <button onclick="deleteProduct(${p.id})" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition duration-200">🗑</button>
+                <button onclick="delete_product(${p.id})" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition duration-200">🗑</button>
             </td>
         </tr>
     `).join("");
@@ -24,8 +24,8 @@ async function delete_products(id) {
 
 document.getElementById("productForm").addEventListener("submit",async (e) => {
     e.preventDefault();
-    const name = document.getElementById("name").ariaValueMax;
-    const price = document.getElementById("price").value;
+    const name = document.getElementById("name").value;
+    const price = parseFloat(document.getElementById("editPrice").value);
     const description = document.getElementById("description").value;
     const categories = document.getElementById("categories").value.split(",").map(cat => cat.trim());
 
@@ -63,7 +63,7 @@ document.getElementById("closeModal").addEventListener("click", () => {
 document.getElementById("saveEdit").addEventListener("click", async () => {
     const id = document.getElementById("editId").value;
     const name = document.getElementById("editName").value;
-    const price = document.getElementById("editPrice").value;
+    const price = parseFloat(document.getElementById("editPrice").value);
     const description = document.getElementById("editDescription").value;
     const categories = document.getElementById("editCategories").value.split(",").map(cat => cat.trim());
 
@@ -74,7 +74,7 @@ document.getElementById("saveEdit").addEventListener("click", async () => {
     });
 
     document.getElementById("editModal").classList.add("hidden");
-    loadProducts();
+    load_products();
 });
 
-loadProducts();
+load_products();
