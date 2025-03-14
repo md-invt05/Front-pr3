@@ -11,7 +11,7 @@ async function load_products() {
             <td class="p-4 hidden md:table-cell">${p.categories.join(", ")}</td>
             <td class="p-4 text-center">
                 <button onclick="editProduct(${p.id})" class="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg mr-2 transition duration-200">✏️</button>
-                <button onclick="delete_product(${p.id})" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition duration-200">🗑</button>
+                <button onclick="delete_products(${p.id})" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition duration-200">🗑</button>
             </td>
         </tr>
     `).join("");
