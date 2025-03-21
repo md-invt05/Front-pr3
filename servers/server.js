@@ -8,6 +8,16 @@ const swaggerUi = require("swagger-ui-express");
 
 const WebSocket = require('ws'); // Подключаем WebSocket
 
+// Вставка json файла
+const fs = require('fs');
+const { json } = require("stream/consumers");
+const productsFile = path.join(__dirname, "products.json");
+
+// Функция для чтения товаров из файла
+function loadProducts() {
+    return JSON.parse(fs.readFileSync(productsFile, 'utf-8'));
+  }
+
 // Определение схемы GraphQL
 const typeDefs = gql`
   type Product {
@@ -45,17 +55,6 @@ async function startServer() {
 app.use(express.json());
 app.use("/admin", express.static(path.join(__dirname, "../public_admin")));
 app.use("/", express.static(path.join(__dirname, "../public_user")));
-
-// Вставка json файла
-const fs = require('fs');
-const { json } = require("stream/consumers");
-const productsFile = path.join(__dirname, "products.json");
-
-// Функция для чтения товаров из файла
-function loadProducts() {
-    return JSON.parse(fs.readFileSync(productsFile, 'utf-8'));
-  }
-  
 
 // Настройка API-эндпоинтов
 app.get("/api/products", (req, res) => {
