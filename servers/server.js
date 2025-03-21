@@ -6,17 +6,56 @@ const path = require("path");
 const yaml = require("yamljs");
 const swaggerUi = require("swagger-ui-express");
 
+const WebSocket = require('ws'); // Подключаем WebSocket
+
+// Определение схемы GraphQL
+const typeDefs = gql`
+  type Product {
+    id: ID!
+    name: String!
+    price: Float!
+    description: String
+    categories: [String]
+  }
+
+  type Query {
+    products: [Product]
+    product(id: ID!): Product
+  }
+`;
+
+
 const app = express();
 const PORT = 3000;
 
+const resolvers = {
+    Query: {
+        products: () => loadProducts(), 
+        product: (_, { id }) => loadProducts().find(p => p.id == id),
+    }
+};
+
+async function startServer() {
+    await server.start();
+    server.applyMiddleware({ app });
+}
+
+
 // Настройка папки для middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../public_admin")));
+app.use("/admin", express.static(path.join(__dirname, "../public_admin")));
+app.use("/", express.static(path.join(__dirname, "../public_user")));
 
 // Вставка json файла
 const fs = require('fs');
 const { json } = require("stream/consumers");
 const productsFile = path.join(__dirname, "products.json");
+
+// Функция для чтения товаров из файла
+function loadProducts() {
+    return JSON.parse(fs.readFileSync(productsFile, 'utf-8'));
+  }
+  
 
 // Настройка API-эндпоинтов
 app.get("/api/products", (req, res) => {
@@ -83,19 +122,71 @@ app.delete("/api/products/:id", (req, res) => {
     }
 });
 
-// Swagger
-const swaggerDocument = yaml.load(path.join(__dirname, "../swagger.yaml"));
-console.log("Swagger YAML загружен:", swaggerDocument);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
-// Main page
-app.get("/", (req, res) => {
+
+// Main page admin
+app.get("/admin", (req, res) => {
     res.sendFile(path.join(__dirname, "../public_admin/index.html"));
 });
 
-// Запуск сервера
-app.listen(PORT, () => {
-    console.log(`Сервер запущен на http://localhost:${PORT}`);
-    console.log(`Документация доступна на http://localhost:${PORT}/api-docs`);
+// Главная страница user
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public_user/index.html"));
+    //console.log(`Отправка файла: ${filePath}`);
+    //res.sendFile(filePath);
 });
+
+// Создаём GraphQL-сервер
+const server = new ApolloServer({ typeDefs, resolvers });
+
+async function startServer() {
+    await server.start();
+    server.applyMiddleware({ app });
+
+
+    // Swagger
+    const swaggerDocument = yaml.load(path.join(__dirname, "../swagger.yaml"));
+    console.log("Swagger YAML загружен:", swaggerDocument);
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    
+    
+    app.listen(PORT, () => {
+        console.log(`GraphQL API запущен на http://localhost:${PORT}/graphql`);
+        console.log(`Swagger API Docs: http://localhost:${PORT}/api-docs`);
+        // Создаём WebSocket-сервер на порту 8080
+        const wss = new WebSocket.Server({ port: 8080 });
+        wss.on('connection', (ws) => {
+            console.log('Новое подключение к WebSocket серверу');
+
+            ws.on('message', (message) => {
+                console.log('📩 Сообщение получено:', message.toString());
+
+                let data;
+                try {
+                    // Пытаемся распарсить входящее сообщение как JSON
+                    data = JSON.parse(message);
+                } catch (e) {
+                    console.error('Ошибка парсинга сообщения:', e);
+                    return;
+                }
+                // Рассылаем сообщение всем подключенным клиентам
+                wss.clients.forEach(client => {
+                    if (client !== ws && client.readyState === WebSocket.OPEN) {
+                        // Отправляем сообщение в виде JSON
+                        client.send(JSON.stringify({ text: data.text }));
+                    }
+                });
+            });
+
+            ws.on('close', () => {
+                console.log('Клиент отключился');
+            });
+        });
+        console.log('WebSocket сервер запущен на ws://localhost:8080');
+    });
+
+}
+
+startServer(); // Запуск сервера
+

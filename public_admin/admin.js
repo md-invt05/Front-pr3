@@ -78,3 +78,62 @@ document.getElementById("saveEdit").addEventListener("click", async () => {
 });
 
 load_products();
+
+// Подключаемся к WebSocket-серверу
+const socket = new WebSocket('ws://localhost:8080');
+
+// Инициализируем историю чата из localStorage (если есть сохранённые сообщения), иначе пустой массив
+let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+
+
+socket.onopen = () => {
+    console.log('Админ подключен к WebSocket серверу');
+};
+
+socket.onmessage = (event) => {
+    try {
+        const data = JSON.parse(event.data);
+        displayMessage(data.text);
+    } catch (error) {
+        console.error('Ошибка обработки сообщения:', error);
+    }
+};
+
+socket.onclose = () => {
+    console.log('WebSocket соединение закрыто');
+};
+
+// Функция отправки сообщения с префиксом "Админ: "
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (message) {
+        // Сразу отображаем собственное сообщение
+        displayMessage("Админ: " + message);
+
+        // Отправляем на сервер
+        socket.send(JSON.stringify({ text: "Админ: " + message }));
+        input.value = '';
+    }
+}
+
+// Функция отображения сообщений в чате
+function displayMessage(message) {
+    // Добавляем новое сообщение в историю
+    chatHistory.push(message);
+    // Сохраняем обновлённую историю в localStorage
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    // Перерисовываем чат
+    renderChatHistory();
+}
+
+
+function renderChatHistory() {
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.innerHTML = chatHistory.map(msg => `<p>${msg}</p>`).join('');
+    // Прокручиваем контейнер вниз, чтобы был виден последний сообщение
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// Вызываем один раз при загрузке, чтобы отобразить сохранённые сообщения
+renderChatHistory();

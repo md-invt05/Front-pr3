@@ -4,7 +4,7 @@
     "main": "index.js",
     "scripts": {
         "start:store": "node servers/userServer.js",
-        "start:admin": "node servers/adminServer.js",
+        "start:admin": "node servers/server.js",
         "start": "concurrently \"npm run start:store\" \"npm run start:admin\"",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -21,6 +21,7 @@
         "graphql": "^16.10.0",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
+        "ws": "^8.18.1",
         "yamljs": "^0.3.0"
     },
     "devDependencies": {

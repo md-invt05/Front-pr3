@@ -61,7 +61,12 @@
             </div>
         </div>
     </div>
-
+    <section id="chat" class="mt-8 p-4 bg-white rounded-xl shadow-lg">
+        <h2 class="text-xl font-semibold text-purple-700 mb-4">Чат поддержки</h2>
+        <div id="chatContainer" class="mb-4" style="max-height: 300px; overflow-y: auto;"></div>
+        <input type="text" id="chatInput" placeholder="Введите сообщение..." class="border p-2 w-full mb-2">
+        <button onclick="sendMessage()" class="w-full bg-purple-600 text-white p-2 rounded">Отправить</button>
+    </section>    
     <script src="admin.js" defer></script>
 </body>
 </html>
